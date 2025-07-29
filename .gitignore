@@ -1,0 +1,8 @@
+.vs
+.idea
+Scratch
+bin
+obj
+.env*
+!.env.example
+.env.production
