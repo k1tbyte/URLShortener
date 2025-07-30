@@ -26,10 +26,6 @@ public sealed class User
     [MaxLength(128)]
     public required string Password { get; set; }
     
-    [Column("password_salt")]
-    [MaxLength(256)]
-    public required string PasswordSalt { get; set; }
-    
     [Column("role")]
     public EUserRole Role { get; set; } = EUserRole.User;
 

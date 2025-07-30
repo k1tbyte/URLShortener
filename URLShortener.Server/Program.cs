@@ -1,12 +1,15 @@
-
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using URLShortener.Infrastructure.Data.Context;
+using URLShortener.Infrastructure.Repositories;
+using URLShortener.Infrastructure.Repositories.Abstraction;
+using URLShortener.Infrastructure.Services;
 using URLShortener.Server.Tools;
 
 namespace URLShortener.Server;
+
 
 public static class Program
 {
@@ -23,19 +26,33 @@ public static class Program
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
         });
+
+        builder.Services.AddRouting(options =>
+        {
+            options.LowercaseUrls = true;
+        });
             
         // Add services to the container.
         builder.Services.AddRazorPages();
         builder.Services.AddControllers();
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
         builder.Services.AddHttpContextAccessor();
         
         
+        
+        
         builder.Services.AddDbContext<AppDbContext>();
+        builder.Services.AddScoped<JwtService>();
+        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        
+        
         
 
-        ConfigureAuthentication(builder);
+        ConfigureAuthenticationAndAuthorization(builder);
         
         _app = builder.Build();
 
@@ -47,9 +64,12 @@ public static class Program
         if (_app.Environment.IsDevelopment())
         {
             _app.MapOpenApi();
+            _app.UseSwagger();
+            _app.UseSwaggerUI();
         }
 
         _app.UseRouting(); 
+        _app.UseAuthentication();
         _app.UseAuthorization();
 
 
@@ -61,7 +81,27 @@ public static class Program
     }
     
     
-    private static void ConfigureAuthentication(WebApplicationBuilder builder)
+    /*static Task TokenValidatedEvent(TokenValidatedContext context)
+    {
+        if (context.SecurityToken.ValidTo >= DateTime.UtcNow) 
+            return Task.CompletedTask;
+            
+        using var scope      = _app.Services.CreateScope();
+        var       jwtService = scope.ServiceProvider.GetService(typeof(JwtAuthService)) as JwtAuthService;
+            
+        //We used only unique claims for easy to use
+        var payload = (context.SecurityToken as JwtSecurityToken)!.Payload;
+            
+        if(jwtService!.RefreshSession(payload, context.Request.Cookies["refresh_token"]))
+            return Task.CompletedTask;
+            
+            
+        context.Fail("Forbidden");
+        return Task.CompletedTask;
+    }*/
+    
+    
+    private static void ConfigureAuthenticationAndAuthorization(WebApplicationBuilder builder)
     {
         builder.Services.AddAuthentication(o =>
         {
@@ -80,32 +120,18 @@ public static class Program
                 ValidateIssuerSigningKey = true,
                 ValidateLifetime         = false,
             };
-            
-            o.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = (context) =>
-                {
-                    var path = context.HttpContext.Request.Path;
-                    if (!path.StartsWithSegments("/hubs"))
-                    {
-                        return Task.CompletedTask; 
-                    }
-
-                    context.Token = context.Request.Query["access_token"];
-                    
-                    if (string.IsNullOrEmpty(context.Token))
-                    {
-                        var authHeader = context.Request.Headers.Authorization.ToString();
-                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
-                        {
-                            context.Token = authHeader.Substring("Bearer ".Length);
-                        }
-                    }
-                    
-                    return Task.CompletedTask;
-                }
-            };
         });
+
+        builder.Services
+            .AddAuthorizationBuilder()
+            .AddPolicy("Authenticated", policy =>
+            {
+                policy.RequireAuthenticatedUser();
+            })
+            .AddPolicy("Admin", policy =>
+            {
+                policy.RequireRole("Admin");
+            });
     }
 
 }
