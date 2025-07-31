@@ -9,7 +9,7 @@ namespace URLShortener.Server.Controllers;
 
 [ApiController]
 [Route(Constants.DefaultApiRoutePattern)]
-public sealed class AuthController(AuthService authService) : ControllerBase
+public sealed class AuthController(IAuthService authService) : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> Register([FromBody] AuthRequest request)
@@ -27,8 +27,6 @@ public sealed class AuthController(AuthService authService) : ControllerBase
         {
             return StatusCode(e.StatusCode, e.Message);
         }
-
-        return Ok();
     }
     
     [HttpPost]
@@ -67,9 +65,9 @@ public sealed class AuthController(AuthService authService) : ControllerBase
     
    [HttpPost]
    [Authorize]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout([FromBody] RefreshRequest request)
     {
-        // Logic for user logout
-        return Ok("Logout successful.");
+        await authService.LogoutAsync(request.RefreshToken);
+        return NoContent();
     }
 }

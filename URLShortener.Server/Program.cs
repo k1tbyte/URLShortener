@@ -46,7 +46,7 @@ public static class Program
         
         builder.Services.AddDbContext<AppDbContext>();
         builder.Services.AddScoped<JwtService>();
-        builder.Services.AddScoped<AuthService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<IUrlsRepository, UrlsRepository>();
         

@@ -96,11 +96,13 @@ export class AuthService {
     }
 
     public static logout() {
-        api.post("/auth/logout", {
-            accessToken: localStorage.getItem("accessToken"),
-            refreshToken: localStorage.getItem("refreshToken")
-        }).then(() => {
-            console.log("Logged out successfully");
+        this.authorizedRequest({
+            url: "/auth/logout",
+            method: "POST",
+            data: {
+                accessToken: localStorage.getItem("accessToken"),
+                refreshToken: localStorage.getItem("refreshToken")
+            }
         }).catch((error) => {
             console.error("Logout error:", error);
         });

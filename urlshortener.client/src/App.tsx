@@ -4,6 +4,7 @@ import { AuthPage } from "./pages/AuthPage/AuthPage.tsx";
 import {LinksPage} from "./pages/LinksPage.tsx";
 import {ModalsHost} from "@/components/Modal.tsx";
 import {LinkInfoPage} from "@/pages/LinkInfoPage.tsx";
+import {TestPage} from "@/pages/TestPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
             {
                 path: "/auth",
                 element: <AuthPage/>
+            },
+            {
+                path: "/another",
+                element: <TestPage/>
             },
             {
                 path: "/links",

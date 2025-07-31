@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using URLShortener.Domain.Entities;
 using URLShortener.Infrastructure.Lib;
 using URLShortener.Infrastructure.Repositories.Abstraction;
@@ -6,7 +8,7 @@ using URLShortener.Infrastructure.Repositories.Abstraction;
 namespace URLShortener.Infrastructure.Services;
 
 public record AuthResult(string RefreshToken, string AccessToken);
-public class AuthService(IUserRepository userRepo, JwtService tokenService, IHttpContextAccessor accessor)
+public class AuthService(IUserRepository userRepo, JwtService tokenService) : IAuthService
 {
     private const int RefreshTokenLifetime = 7; //days
     /*#if DEBUG
@@ -49,6 +51,11 @@ private const int AccessTokenLifetime = 200; //minutes
             refresh.ToString(),
             access
         );
+    }
+    
+    public Task LogoutAsync(Guid refreshToken)
+    {
+        return userRepo.DeleteSessionAsync(refreshToken);
     }
 
     public async Task<AuthResult> RefreshSessionAsync(string accessToken, Guid refreshToken)
