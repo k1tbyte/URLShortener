@@ -5,10 +5,10 @@ import {KeyRound, User} from "lucide-react";
 import Input from "@/components/Input.tsx";
 import {PasswordBox} from "@/components/PasswordBox.tsx";
 import {Button} from "@/components/Button.tsx";
-import {authApi} from "@/api/auth.tsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "@/providers/authProvider.tsx";
+import {AuthService} from "@/services/api/authService.ts";
+import axios from "axios";
 
 export const RegisterForm = () => {
     const {
@@ -18,7 +18,6 @@ export const RegisterForm = () => {
     } = useForm<FormData>();
     const [error, setError] = useState<string | null>(null);
     let navigate = useNavigate();
-    const auth = useAuth();
 
     const formValidation = useFormValidation([
         validators.login,
@@ -31,15 +30,17 @@ export const RegisterForm = () => {
 
     const onRegister = async (data: FormData) => {
         setError(null);
-        // @ts-ignore
-        const response = await authApi.register(data);
-        if (!response.ok) {
-            setError(await response.text());
+        try {
+            // @ts-ignore
+            await AuthService.register(data);
+        } catch (error) {
+            setError(axios.isAxiosError(error) ?
+                (error.response?.data || "An error occurred during registration.") :
+                "An unexpected error occurred during registration");
             return;
         }
-        authApi.storeTokens(await response.json())
-        auth.refresh()
-        navigate("/links", {replace: true});
+
+        navigate("/links", {replace: true})
     }
 
     return (

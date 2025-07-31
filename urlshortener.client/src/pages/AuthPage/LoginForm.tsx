@@ -5,10 +5,10 @@ import {InputValidationWrapper} from "@/components/FieldWrapper.tsx";
 import {PasswordBox} from "@/components/PasswordBox.tsx";
 import {useFormValidation, validators} from "@/hooks/useFormValidation.ts";
 import {Button} from "@/components/Button.tsx";
-import {authApi} from "@/api/auth.tsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {useAuth} from "@/providers/authProvider.tsx";
+import {AuthService} from "@/services/api/authService.ts";
+import axios from "axios";
 
 export const LoginForm = () => {
     const {
@@ -19,7 +19,6 @@ export const LoginForm = () => {
     } = useForm<FormData>();
     const [error, setError] = useState<string | null>(null);
     let navigate = useNavigate();
-    const auth = useAuth();
 
     const formValidation = useFormValidation([
         validators.login,
@@ -30,18 +29,19 @@ export const LoginForm = () => {
 
     const onLogin = async (data: FormData) => {
         setError(null);
-        // @ts-ignore
-        const response = await authApi.login(data);
-        if (!response.ok) {
-            const errorText = await response.text();
+        try {
+            // @ts-ignore
+            await AuthService.login(data);
+        } catch (error) {
             // @ts-ignore
             resetField("password");
-            setError(errorText);
+            setError(axios.isAxiosError(error) ?
+                (error.response?.data || "An error occurred during login") :
+                "An unexpected error occurred during login");
             return;
         }
-        authApi.storeTokens(await response.json())
-        auth.refresh()
-        navigate("/links", {replace: true});
+
+        navigate("/links", {replace: true})
     }
 
     return (

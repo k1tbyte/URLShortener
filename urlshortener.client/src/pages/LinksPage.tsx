@@ -1,29 +1,22 @@
-import {useEffect} from "react";
 import {useAuth} from "@/providers/authProvider.tsx";
+import {AuthService} from "@/services/api/authService.ts";
+import useSWR from "swr";
 
 export const LinksPage = () => {
-    const auth = useAuth();
+    const auth = useAuth(true);
 
-    useEffect(() => {
-        if(auth.isAuthenticated) {
-            auth.authorizedRequest("/api/links/getlinks", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }).then(async response => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch links");
-                }
-                console.log(await response.json());
-            })
-        }
-    }, [auth.isAuthenticated]);
+    const { data, error, isLoading: swrLoading } = useSWR(
+        auth.isLoading ? null : "/links/getlinks",
+        (url) => AuthService.authorizedRequest({ url, method: "GET" })
+    );
 
+    if (auth.isLoading || swrLoading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
-     return (
+    return (
         <div className="h-full">
             Hello, this is the Links Page!
+            <pre>{JSON.stringify(data, null, 2)}</pre>
         </div>
-     )
-}
+    );
+};
