@@ -2,6 +2,7 @@ import {createBrowserRouter, Navigate, RouterProvider} from 'react-router-dom'
 import {MainLayout} from "./layouts/MainLayout.tsx";
 import { AuthPage } from "./pages/AuthPage/AuthPage.tsx";
 import {LinksPage} from "./pages/LinksPage.tsx";
+import {ModalsHost} from "@/components/Modal.tsx";
 
 const router = createBrowserRouter([
     {
@@ -26,7 +27,11 @@ const router = createBrowserRouter([
 
 function App() {
     return (
-        <RouterProvider router={router}/>
+        <>
+            <RouterProvider router={router}/>
+            <ModalsHost/>
+        </>
+
     );
 }
 

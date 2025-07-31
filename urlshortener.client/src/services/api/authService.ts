@@ -68,23 +68,21 @@ export class AuthService {
 
         const now = Math.floor(Date.now() / 1000);
 
-        // Если UserInfo уже есть и токен живой — ничего не делаем
-        if (this.UserInfo && this.UserInfo.exp > now + 10) {
+        let decoded: IUserInfo;
+        try {
+            decoded = jwtDecode<IUserInfo>(accessToken);
+        } catch (e) {
+            this.logout();
+            return;
+        }
+
+        if (decoded.exp > now + 10) {
+            this.UserInfo = decoded;
+            (this.OnUserInfoChanged as EventEmitter<IUserInfo | undefined>).emit(this.UserInfo);
             return;
         }
 
         try {
-            // Если UserInfo нет — декодируем токен
-            const decoded = this.UserInfo ?? jwtDecode<IUserInfo>(accessToken);
-
-            // Если токен всё ещё живой — сохраняем в UserInfo
-            if (decoded.exp > now + 10) {
-                this.UserInfo = decoded;
-                (this.OnUserInfoChanged as EventEmitter<IUserInfo | undefined>).emit(this.UserInfo);
-                return;
-            }
-
-            // Если токен протух — делаем refresh
             const response = await api.post<TypeTokensResponse>("/auth/refreshSession", {
                 accessToken,
                 refreshToken,

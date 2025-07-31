@@ -48,6 +48,7 @@ public static class Program
         builder.Services.AddScoped<JwtService>();
         builder.Services.AddScoped<AuthService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<IUrlsRepository, UrlsRepository>();
         
         
         

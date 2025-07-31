@@ -8,7 +8,6 @@ const api = axios.create({
     timeout: 10000,
 });
 
-/*
 api.interceptors.request.use((config) => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
@@ -27,6 +26,5 @@ api.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-*/
 
 export default api;

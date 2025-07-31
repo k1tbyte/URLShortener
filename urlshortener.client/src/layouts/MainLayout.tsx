@@ -10,7 +10,10 @@ export const MainLayout: FC = ( ) => {
             <AuthProvider>
                 <div className="flex w-full h-svh flex-col justify-center items-center">
                     <Navbar/>
-                    <Outlet/>
+                    <div className="h-full w-full container">
+                        <Outlet/>
+                    </div>
+
                 </div>
             </AuthProvider>
         </RouterProvider>

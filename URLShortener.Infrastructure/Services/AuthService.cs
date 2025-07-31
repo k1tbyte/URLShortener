@@ -12,7 +12,7 @@ public class AuthService(IUserRepository userRepo, JwtService tokenService, IHtt
     /*#if DEBUG
 private const int AccessTokenLifetime = 200; //minutes
 #else*/
-    private const int AccessTokenLifetime = 1; //minutes
+    private const int AccessTokenLifetime = 10; //minutes
     /*#endif*/
     private const int MaxSessionsAmount = 5;
     

@@ -23,8 +23,8 @@ export const AuthPage = () => {
     }
 
     return (
-        <div className="h-full flex items-center max-w-96 w-full">
-            <div className="backdrop-primary px-6 py-10 w-full rounded-xl">
+        <div className="h-full flex items-center justify-center w-full">
+            <div className="backdrop-primary px-6 py-10 w-full rounded-xl max-w-96">
                 <h1 className="text-2xl text-center text-foreground-accent font-bold ">Authentication</h1>
                 <div className="h-0.5 bg-background w-full my-3"></div>
                 <TabPanel activeKey={"login"} className="bg-primary border-tertiary rounded-xl mb-1">

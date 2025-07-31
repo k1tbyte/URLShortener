@@ -23,9 +23,7 @@ export const LoginForm = () => {
     const formValidation = useFormValidation([
         validators.login,
         validators.password,
-    ], (e) => {
-        console.log(e)
-    })
+    ])
 
     const onLogin = async (data: FormData) => {
         setError(null);

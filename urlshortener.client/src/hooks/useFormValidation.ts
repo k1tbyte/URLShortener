@@ -82,6 +82,14 @@ export const useFormValidation = (validators: Array<TypeInputValidator | string>
 
 export const validators: { [key: string]: TypeInputValidator  } = {
     required:  input =>  input.length == 0 ? "Required" : null,
+    url: input => {
+        try {
+            new URL(input);
+            return null;
+        } catch (e) {
+            return "Invalid URL";
+        }
+    },
     login: input => loginRegex.test(input) ? null : "Invalid login",
     password: input => input.length < 6 ? "Must be minimum 6 characters" : null,
     phone: input => input.length > 0 && input.length < 8 ? "Invalid phone number" : null,
