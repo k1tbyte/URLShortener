@@ -33,7 +33,7 @@ const ShortUrlCard: FC<IShortUrlCardProps> = ({ link, mutate } ) => {
             <a href={link.originalUrl} target="_blank" rel="noopener noreferrer"
                className="text-foreground-accent hover:underline">{link.originalUrl}</a>
             <div className="text-sm text-gray-500 mt-2">Short URL:</div>
-            <a href={`/link/${link.shortUrl}`} target="_blank" rel="noopener noreferrer"
+            <a href={`/short/${link.shortUrl}`} target="_blank" rel="noopener noreferrer"
                className="text-secondary hover:underline">{link.shortUrl}</a>
             { auth.isAuthenticated && (
                 <div className="w-full flex justify-end mt-2">
@@ -44,7 +44,7 @@ const ShortUrlCard: FC<IShortUrlCardProps> = ({ link, mutate } ) => {
                                 Delete
                             </Button>
                         )}
-                        <Button variant={"outlined"} size={"sm"}>
+                        <Button variant={"outlined"} className="flex-center" size={"sm"} to={`/link/${link.id}`}>
                             Details
                         </Button>
                     </div>

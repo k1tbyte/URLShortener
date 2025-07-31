@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using URLShortener.Domain.Entities;
@@ -32,16 +33,26 @@ public sealed class LinksController(IUrlsRepository repository) : ControllerBase
     [Authorize]
     public IActionResult GetLinkById(int id)
     {
-        var link = repository.Set.FirstOrDefault(x => x.Id == id);
+        var link = repository.Set.Include(o => o.CreatedByUser).FirstOrDefault(x => x.Id == id);
         if (link is null)
         {
             return NotFound();
         }
-        
-        return Ok(link);
+
+        return Ok(new
+        {
+            Id = link.Id,
+            ShortCode = link.ShortCode,
+            OriginalUrl = link.OriginalUrl,
+            CreatedByUsername = link.CreatedByUser.Username,
+            CreatedAt = DateTimeOffset.FromUnixTimeSeconds(link.CreatedAt).UtcDateTime,
+            Owned = link.CreatedBy == int.Parse(User.Claims
+                .FirstOrDefault(c => c.Type == "userid")?.Value!),
+            Clicks = link.UrlClicks
+        });
     }
 
-    [HttpGet("/link/{code}")]
+    [HttpGet("/short/{code}")]
     public IActionResult Link(string code)
     {
         Console.WriteLine($"Redirecting to original URL for code: {code}");
@@ -55,17 +66,34 @@ public sealed class LinksController(IUrlsRepository repository) : ControllerBase
     [Authorize]
     public async Task<IActionResult> CreateLink([FromBody] CreateLinkRequest request)
     {
-        var userId = User.Claims
-            .FirstOrDefault(c => c.Type == "userid")?.Value!;
+        var userId = User.Claims.FirstOrDefault(c => c.Type == "userid")?.Value!;
         
-        await repository.WithAutoSave().Add(new ShortUrl
+
+        // Simple hash using SHA256, take first 8 characters of hex
+        using var sha256 = System.Security.Cryptography.SHA256.Create();
+        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(request.Url));
+        var hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower(); // hex string
+        var shortCode = hash.Substring(0, 8); // first 8 characters
+        
+        // Check if link already exists
+        var existing = await repository.Set
+            .FirstOrDefaultAsync(x => x.ShortCode == shortCode);
+
+        if (existing != null)
+        {
+            return Conflict("Link already exists");
+        }
+
+        var newEntry = new ShortUrl
         {
             OriginalUrl = request.Url,
-            ShortCode = Guid.NewGuid().ToString("N").Substring(0, 8),
+            ShortCode = shortCode,
             CreatedBy = int.Parse(userId),
-        });
+        };
 
-        return Ok();
+        await repository.WithAutoSave().Add(newEntry);
+
+        return Ok(new { shortCode });
     }
     
     [HttpDelete("{id}")]

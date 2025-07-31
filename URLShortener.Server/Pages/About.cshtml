@@ -13,19 +13,47 @@
 <body>
     <div class="container mt-4">
         <div class="alert alert-info mb-4">
-            <strong>Важно!</strong> Вы находитесь на странице Razor Pages на порту ASP.NET Core: <code>http://localhost:5031/About</code>
+            <code><h2> <b>URLShortener by kitbyte!</b></h2> How this website works?</code>
         </div>
         
-        <h1>О проекте</h1>
+        <h1 class="alert alert-info">Sorry, I didn't have time to make this page editable for admins :(
+            <br/>
+            <br/>
+            I spent my time on refactoring and testing</h1>
+        
+        <h1>About This Project</h1>
         <div class="card mt-3">
             <div class="card-body">
-                <h5 class="card-title">Привет от Razor Pages!</h5>
-                <p class="card-text">Это страница, отрендеренная с помощью Razor Pages.</p>
-                <p>Текущее время на сервере: @Model.CurrentTime</p>
+                <p class="card-text">
+                    This URL Shortener is a test assignment developed for <strong>Inforce</strong>. It allows users to generate short links for long URLs, track the original address, and optionally manage their links.
+                </p>
+                <p class="card-text">
+                    The application includes both a <strong>Single Page Application (SPA)</strong> built with React for authenticated link management, and a separate static page rendered with <strong>ASP.NET Razor Pages</strong> to demonstrate server-side rendering capabilities.
+                </p>
+                <span class="card-text">
+                    Key features include:
+                    <ul>
+                        <li>User authentication using JWT</li>
+                        <li>Admin-specific permissions (e.g. deleting links regardless of ownership)</li>
+                        <li>Short and original URL display</li>
+                        <li>Server-side date rendering and static page content</li>
+                    </ul>
+                </span>
+                
+                <h2>How It Works</h2>
+                <p class="card-text">
+                    The URL Shortener works by generating a unique short identifier for every long URL a user submits. Here's a brief overview of the process:
+                </p>
+                <ol>
+                    <li><strong>Submission:</strong> A user submits a long URL through the interface.</li>
+                    <li><strong>Validation:</strong> The backend validates the URL format and checks for duplicates.</li>
+                    <li><strong>Hashing/Encoding:</strong> If the URL is new, the backend generates a short code using either hashing or incremental ID encoding (e.g., Base62).</li>
+                    <li><strong>Storage:</strong> The mapping between the short code and the original URL is stored in a database.</li>
+                    <li><strong>Redirection:</strong> When a user visits the short URL (e.g. <code>/abc123</code>), the server looks up the original URL and redirects the user to it</li>
+                </ol>
                 
                 <div class="mt-4">
-                    <a href="/Contact" class="btn btn-secondary me-2">Контакты (Razor Page)</a>
-                    <a href="/" class="btn btn-primary">Вернуться на React главную</a>
+                    <a href="/" class="btn btn-primary">Back to App</a>
                 </div>
             </div>
         </div>

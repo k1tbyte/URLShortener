@@ -6,7 +6,7 @@ import {useAuth} from "@/providers/authProvider.tsx";
 
 const NAV_ITEMS = [
     { to: '/links', label: 'Links' },
-    { to: '/about', label: 'About' },
+    { to: '/another', label: 'Another' },
 ];
 
 interface INavItemProps {
@@ -39,6 +39,11 @@ export const Navbar = () => {
                         </NavItem>
                     ))
                     }
+                    <Button variant={"outlined"} className="flex-center" onClick={() => {
+                        window.open("/about", "_self");
+                    }}>
+                        About
+                    </Button>
                 </div>
                 { isAuthenticated === false &&
                     <Button to={"/auth"} variant={"outlined"} className="text-md">

@@ -7,6 +7,16 @@ export interface IShortUrl {
     shortUrl: string;
 }
 
+export interface IShortUrlFull {
+    id: string;
+    owned: boolean;
+    originalUrl: string;
+    shortCode: string;
+    clicks: any[];
+    createdAt: string;
+    createdByUsername: string;
+}
+
 export class LinksService {
     public static async getLinks(): Promise<IShortUrl[]> {
         return AuthService.authorizedRequest<IShortUrl[]>({
@@ -29,6 +39,13 @@ export class LinksService {
             url: `/links/deleteLink/${id}`,
             method: "DELETE",
             data: { id: Number(id) }
+        });
+    }
+
+    public static getLinkById(id: string): Promise<IShortUrlFull> {
+        return AuthService.authorizedRequest<IShortUrlFull>({
+            url: `/links/getLinkById?id=${id}`,
+            method: "GET"
         });
     }
 }

@@ -3,6 +3,7 @@ import {MainLayout} from "./layouts/MainLayout.tsx";
 import { AuthPage } from "./pages/AuthPage/AuthPage.tsx";
 import {LinksPage} from "./pages/LinksPage.tsx";
 import {ModalsHost} from "@/components/Modal.tsx";
+import {LinkInfoPage} from "@/pages/LinkInfoPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
             {
                 path: "/links",
                 element: <LinksPage/>
+            },
+            {
+                path: "/link/:id",
+                element: <LinkInfoPage/>
             }
         ]
     }

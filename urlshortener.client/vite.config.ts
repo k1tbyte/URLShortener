@@ -52,14 +52,18 @@ export default defineConfig({
                 target,
                 secure: false
             },
-            '^/About': {
+            '^/about': {
                 target,
                 secure: false
             },
             '^/api': {
                 target,
                 secure: false
-            }
+            },
+            '^/short': {
+                target,
+                secure: false
+            },
         },
         port: parseInt(env.DEV_SERVER_PORT || '1973'),
         https: {

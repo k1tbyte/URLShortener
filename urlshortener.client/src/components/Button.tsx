@@ -36,7 +36,7 @@ export const Button: FC<IButtonProps> = ({ children, isLoading,to, ref, variant,
 
     return (
         // @ts-ignore
-        <Comp ref={ref}
+        <Comp ref={ref} to={to}
                 className={cn({ "pointer-events-none ": isLoading }, buttonVariants({ variant, size, className }))}
                 {...props}>
             {isLoading ? <div className="w-full h-full flex-center">
